@@ -4,8 +4,7 @@ from werkzeug import secure_filename
 
 from MakeGif import makegif
 
-
-application = Flask(__name__, static_folder = 'static', static_url_path = 'static')
+application = Flask(__name__, static_folder = 'static', static_url_path = '/static')
 
 
 #Set application.debug=true to enable tracebacks on Beanstalk log output. 
