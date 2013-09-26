@@ -24,6 +24,10 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@application.route('/var')
+def var():
+	return str(os.getcwd())
+
 @application.route('/fz/<filename>')
 def uploaded_file(filename):
     return send_from_directory(GIF_FOLDER, filename)
@@ -41,11 +45,6 @@ def upload_file():
 
         return 'File extention not allowed! only jpg or jpeg'
 
-    user_agent = request.headers.get('User-Agent')
-    b = reg_b.search(user_agent)
-    v = reg_v.search(user_agent[0:4])
-    if b or v:
-    	return render_template('index.html')
     return render_template('index.html')
 
 if __name__ == '__main__':
