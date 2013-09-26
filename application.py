@@ -32,9 +32,9 @@ def var():
 def uploaded_file(filename):
     return send_from_directory(GIF_FOLDER, filename)
 
-@application.route('/layout/<filename>')
-def uploaded_file(filename):
-    return send_from_directory('layout/', filename)
+@application.route('/layout/<name>')
+def layout_files(name):
+    return send_from_directory('layout/', name)
 
 @application.route('/', methods=['GET', 'POST'])
 def upload_file():
