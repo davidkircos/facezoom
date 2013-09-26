@@ -1,0 +1,32 @@
+<!doctype html>
+<meta name="viewport" content="width=device-width, initial-scale=.4, maximum-scale=.4, user-scalable=no" />
+<style type="text/css">
+div.upload {
+    width: 640px;
+    height: 640px;
+    background: url(/static/upload_icon.png);
+    overflow: hidden;
+}
+div.upload input {
+    display: block !important;
+    width: 640px !important;
+    height: 640px !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+}
+</style>
+<br>
+<title>facezoom</title>
+<body bgcolor="#461B7E">
+<center>
+<head><font color=orange size=36>facezoom</font></head>
+<br><br><br><br>
+<form action="" method=post enctype=multipart/form-data>
+    <div class="upload">
+        <input type=file name=file onchange="javascript:this.form.submit();">
+    </div>
+</form>
+</center>
+</form>
+</body>
+</html>
