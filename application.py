@@ -32,6 +32,10 @@ def var():
 def uploaded_file(filename):
     return send_from_directory(GIF_FOLDER, filename)
 
+@application.route('/static/<filename>')
+def uploaded_file(filename):
+    return send_from_directory('static/', filename)
+
 @application.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
