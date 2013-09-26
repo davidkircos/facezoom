@@ -32,6 +32,7 @@ def allowed_file(filename):
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @application.route('/fz/<imagename>')
+@application.route('/im/<imagename>')
 def uploaded_file(imagename):
     return render_template('image.html', imageurl="https://{0}.s3.amazonaws.com/{1}.gif".format(fz_s3_bucket.name, imagename), imagename=imagename)
 
@@ -69,7 +70,7 @@ def upload_file():
             os.remove(filename_wpath)
             os.remove(gif_file_name_wpath)
 
-            return redirect(GIF_FOLDER+filename.rsplit('.', 1)[0])
+            return redirect('im/'+filename.rsplit('.', 1)[0])
 
         error = "File extension not allowed, use jpg or jpeg."
     return render_template('index.html', error=error)
