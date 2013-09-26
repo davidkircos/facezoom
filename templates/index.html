@@ -24,7 +24,11 @@ div.upload input {
 <font color=lightblue size="12"><sup><small>BETA</small></sup></font>
 
 </head>
-<br><br><br><br>
+<br><br>
+{% if error %}
+<font color="red">{{ error }}</font>
+{% endif %}
+<br><br>
 <form action="" method=post enctype=multipart/form-data>
     <div class="upload">
         <input type=file name=file onchange="javascript:this.form.submit();">
