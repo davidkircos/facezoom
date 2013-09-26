@@ -4,7 +4,7 @@ from werkzeug import secure_filename
 
 from MakeGif import makegif
 
-application = Flask(__name__, static_folder = 'static', static_url_path = '/static')
+application = Flask(__name__)
 
 
 #Set application.debug=true to enable tracebacks on Beanstalk log output. 
@@ -32,9 +32,9 @@ def var():
 def uploaded_file(filename):
     return send_from_directory(GIF_FOLDER, filename)
 
-@application.route('/static/<filename>')
+@application.route('/layout/<filename>')
 def uploaded_file(filename):
-    return send_from_directory('static/', filename)
+    return send_from_directory('layout/', filename)
 
 @application.route('/', methods=['GET', 'POST'])
 def upload_file():
