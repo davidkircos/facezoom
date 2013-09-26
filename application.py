@@ -25,7 +25,7 @@ application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 def file_name_generator(legnth):
-	return ''.join(random.sample(string.ascii_letters+string.digits,10))
+    return ''.join(random.sample(string.ascii_letters+string.digits,10))
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -39,13 +39,18 @@ def uploaded_file(imagename):
 def layout_files(name):
     return send_from_directory('layout/', name)
 
+@application.route('/test')
+def test():
+    import glob
+    return str(glob.glob(os.getcwd()+"/fz/*")) + '\n' + str(glob.glob(os.getcwd()+"/uploads/*"))
+
 @application.route('/', methods=['GET', 'POST'])
 def upload_file():
     error = None
     if request.method == 'POST':
         upload_file = request.files['file']
         if upload_file and allowed_file(upload_file.filename):
-        	#save upload
+            #save upload
             filename = file_name_generator(10) + '.' + upload_file.filename.rsplit('.', 1)[1].lower()
             filename_wpath = UPLOAD_FOLDER + filename
             upload_file.save(os.path.join(application.config['UPLOAD_FOLDER'], filename))
