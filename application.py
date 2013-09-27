@@ -20,7 +20,7 @@ application.debug=True
 
 UPLOAD_FOLDER = 'uploads/'
 GIF_FOLDER = 'fz/'
-ALLOWED_EXTENSIONS = set(['jpg', 'jpeg'])
+ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'png'])
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -72,7 +72,7 @@ def upload_file():
 
             return redirect('im/'+filename.rsplit('.', 1)[0])
 
-        error = "File extension not allowed, use jpg or jpeg."
+        error = "File extension not allowed, use jpg, jpeg, png."
     return render_template('index.html', error=error)
 
 if __name__ == '__main__':
