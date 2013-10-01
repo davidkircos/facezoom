@@ -12,6 +12,8 @@ def makegif(jpg_file_name, result_file_name):
 		f.close()
 		if str(tags['Image Orientation']) == 'Rotated 90 CCW':
 			temp_image = temp_image.rotate(-90)
+		if str(tags['Image Orientation']) == 'Rotated 90 CW':
+			temp_image = temp_image.rotate(90)
 	except KeyError:
 		pass
 
@@ -43,4 +45,5 @@ def makegif(jpg_file_name, result_file_name):
 	#writes gif to file
 	writeGif(gif_file_name, frames, duration=original_duration, dither=0)
 
+	#returns the file name, this isn't really nessicary sense we gave it a file name initially and they just have different extenions (.*** in .gif out)
 	return gif_file_name
