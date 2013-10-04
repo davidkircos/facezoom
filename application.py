@@ -7,6 +7,7 @@ import boto
 from MakeGif import makegif
 
 application = Flask(__name__)
+#sslify = SSLify(application) #adds https
 
 #information to log onto s3 to save the image files
 S3_PUBLIC_KEY = "AKIAIWHKKSAX2GVRHUZQ"
@@ -18,7 +19,7 @@ fz_s3_bucket = s3_connection.get_bucket("fz-images")
 
 #Set application.debug=true to enable tracebacks on Beanstalk log output. 
 #Make sure to remove this line before deploying to production.
-application.debug=True
+application.debug=False
 
 #folders where uploads are temporary stored 
 UPLOAD_FOLDER = 'uploads/'
@@ -32,7 +33,7 @@ application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #generates 10 char file names made with upper lower case letters and numbers 0-9
 def file_name_generator(legnth):
-    return ''.join(random.sample(string.ascii_letters+string.digits,10))
+    return ''.join(random.sample(string.ascii_letters+string.digits,legnth))
 
 #checks if a file name is allowed
 def allowed_file(filename):
@@ -83,10 +84,11 @@ def upload_file():
             os.remove(gif_file_name_wpath)
 
             return redirect('im/'+filename.rsplit('.', 1)[0])
+
         #error is used to store a string of the error.  Not rendered if blank.
         error = "File extension not allowed, use jpg, jpeg, png."
     return render_template('index.html', error=error)
 
 #starts the web server, not sure if this is needed in production 
 if __name__ == '__main__':
-    application.run(host='0.0.0.0', debug=True)
+    application.run(host='0.0.0.0')
