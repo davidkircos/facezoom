@@ -81,7 +81,7 @@ def upload_file():
 
             #cleanup files
             os.remove(filename_wpath)
-            os.remove(gif_file_name_wpath)
+            #os.remove(gif_file_name_wpath)
 
             return redirect('im/'+filename.rsplit('.', 1)[0])
 
