@@ -29,14 +29,14 @@ def makegif(jpg_file_name, result_file_name):
 	#generate fames to be put into gif
 	w,h = temp_image.size
 	frames = [temp_image.copy()]
-	mult = 38
+	mult = 40
 	for x in range(1,3):
 		x = x * mult
+		temp_image = temp_image.rotate(2)
 		temp_image = temp_image.crop((29,29,w-x*w/h,h-x*h/w))
 		sharpener = ImageEnhance.Sharpness(temp_image.convert('RGB'))
 		temp_image = sharpener.enhance(1)
 		temp_image = temp_image.resize((w, h), Image.ANTIALIAS)
-		temp_image = temp_image.rotate(2)
 		frames.append(temp_image.copy())
 
 	#sets gif filename

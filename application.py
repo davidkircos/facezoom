@@ -71,7 +71,7 @@ def upload_file():
 
             #writes disk to disk
             gif_file_name_wpath = makegif(os.path.join(application.config['UPLOAD_FOLDER'], filename), os.path.join((GIF_FOLDER + filename)))
-
+            
             #upload gif to s3
             s3_fz_key = boto.s3.key.Key(fz_s3_bucket)
             s3_fz_key.key = gif_file_name_wpath[len(GIF_FOLDER):]
@@ -81,7 +81,7 @@ def upload_file():
 
             #cleanup files
             os.remove(filename_wpath)
-            #os.remove(gif_file_name_wpath)
+            os.remove(gif_file_name_wpath)
 
             return redirect('im/'+filename.rsplit('.', 1)[0])
 
