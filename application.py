@@ -114,7 +114,7 @@ def upload_file():
             sha1sum = hashlib.sha1(open(os.path.join(application.config['UPLOAD_FOLDER'], filename),'rb').read()).hexdigest()
             if sha1sum in image_hashes:
                 #keeps the hash list short
-                if image_hashes.length() > 25:
+                if len(image_hashes) > 25:
                     image_hashes.pop(0)
                 #cleanup upload file
                 os.remove(filename_wpath)
