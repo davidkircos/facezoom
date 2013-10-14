@@ -18,6 +18,12 @@ class im_db:
 		self.dbitem_latest.save()
 		self.latest += 1
 
+	def removelatest(self):
+		self.imtable.get_item(self.latest).delete()
+		self.dbitem_latest.add_attribute("most reacent", -1)
+		self.dbitem_latest.save()
+		self.latest -= 1
+
 	def addimage(self, s3id):
 		"""given an id, adds the item to the db and increments the db count"""
 		self.imtable.new_item(hash_key = self.latest+1, attrs= {"s3id" : s3id}).put()

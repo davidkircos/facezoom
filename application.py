@@ -2,6 +2,7 @@ import os, random, string
 from flask import Flask, request, redirect, url_for, send_from_directory, render_template, jsonify
 from werkzeug import secure_filename
 from fzdb import im_db
+import hashlib, copy
 
 import boto
 
@@ -11,7 +12,7 @@ application = Flask(__name__)
 
 #Set application.debug=true to enable tracebacks on Beanstalk log output. 
 #Make sure to remove this line before deploying to production.
-application.debug=False
+application.debug=True
 
 #information to log onto s3 to save the image files
 S3_PUBLIC_KEY = "AKIAIWHKKSAX2GVRHUZQ"
@@ -37,6 +38,9 @@ GIF_FOLDER = 'fz/'
 #config for the uploads on the server
 ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'png'])
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+#to prevent double uploads
+image_hashes = []
 
 #generates 10 char file names made with upper lower case letters and numbers 0-9
 def file_name_generator(legnth):
@@ -84,20 +88,41 @@ def get(number = 15):
     result["STATUS"] = status
     return jsonify(result)
 
+#browse page
+@application.route('/browse')
+@application.route('/browse/')
+def browse():
+    #need to actually make that template :P
+    images_url_list = []
+    for item in fz_images_db.getimagenames(15):
+        images_url_list.insert(0,"https://{0}.s3.amazonaws.com/{1}.gif".format(fz_s3_bucket.name, item[1]))
 
-#home page has both GET and POST options as the upload is against the root domain
-@application.route('/', methods=['GET', 'POST'])
+    return render_template('browse.html', images=images_url_list)
+
+@application.route('/upload', methods=['POST'])
 def upload_file():
     error = None
     if request.method == 'POST':
         upload_file = request.files['file']
         if upload_file and allowed_file(upload_file.filename):
-            #save upload
+            #saves upload to disk
             filename = file_name_generator(10) + '.' + upload_file.filename.rsplit('.', 1)[1].lower()
             filename_wpath = UPLOAD_FOLDER + filename
             upload_file.save(os.path.join(application.config['UPLOAD_FOLDER'], filename))
 
-            #writes disk to disk
+            #checks upload unqunes, prevents back button from doing a duplicate upload
+            sha1sum = hashlib.sha1(open(os.path.join(application.config['UPLOAD_FOLDER'], filename),'rb').read()).hexdigest()
+            if sha1sum in image_hashes:
+                #keeps the hash list short
+                if image_hashes.length() > 25:
+                    image_hashes.pop(0)
+                #cleanup upload file
+                os.remove(filename_wpath)
+                return redirect('/upload')
+            else:
+                image_hashes.append(sha1sum)
+
+            #writes gif to disk
             gif_file_name_wpath = makegif(os.path.join(application.config['UPLOAD_FOLDER'], filename), os.path.join((GIF_FOLDER + filename)))
             
             #upload gif to s3
@@ -118,6 +143,13 @@ def upload_file():
 
         #error is used to store a string of the error.  Not rendered if blank.
         error = "File extension not allowed, use jpg, jpeg, png."
+
+    return render_template('index.html', error=error)
+
+
+#home page has both GET and POST options as the upload is against the root domain
+@application.route('/', methods=['GET'])
+def index(error = None):
     return render_template('index.html', error=error)
 
 #starts the web server, not sure if this is needed in production 

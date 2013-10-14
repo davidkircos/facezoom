@@ -1,40 +1,25 @@
 <!doctype html>
-<meta name="viewport" content="width=device-width, initial-scale=.4, maximum-scale=.4, user-scalable=no" />
-<style type="text/css">
-div.upload {
-    width: 640px;
-    height: 640px;
-    background: url(/layout/upload_icon.png);
-    overflow: hidden;
-}
-div.upload input {
-    display: block !important;
-    width: 640px !important;
-    height: 640px !important;
-    opacity: 0 !important;
-    overflow: hidden !important;
-}
-</style>
-<br>
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@facezoomapp">
+<meta name="twitter:title" content="broswse facezoom">
+<meta name="twitter:description" content="facezoom generates animated zooming gifs">
+
 <title>facezoom</title>
+<html>
+<body>
+
 <body bgcolor="#461B7E">
 <center>
 <head>
 <font color=orange size=36>facezoom</font>
 <font color=lightblue size="12"><sup><small>BETA</small></sup></font>
 
-</head>
-<br><br>
-{% if error %}
-<font color="red">{{ error }}</font>
-{% endif %}
-<br><br>
-<form action="/upload" method=post enctype=multipart/form-data>
-    <div class="upload">
-        <input type=file name=file onchange="javascript:this.form.submit();">
-    </div>
-</form>
+{% for image in images %}
+<center>
+<img src="{{ image }}" alt="facezoom">
 <br>
+{% endfor %}
+
 <!-- AddThis Button BEGIN -->
 <style>
         div.addthis_toolbox {
@@ -57,5 +42,7 @@ addthis_config.data_track_clickback = false;
 <!-- AddThis Button END -->
 
 </center>
+
+
 </body>
-</html>
+</head>
