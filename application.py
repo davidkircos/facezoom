@@ -1,13 +1,17 @@
 import os, random, string
-from flask import Flask, request, redirect, url_for, send_from_directory, render_template
+from flask import Flask, request, redirect, url_for, send_from_directory, render_template, jsonify
 from werkzeug import secure_filename
+from fzdb import im_db
 
 import boto
 
 from MakeGif import makegif
 
 application = Flask(__name__)
-#sslify = SSLify(application) #adds https
+
+#Set application.debug=true to enable tracebacks on Beanstalk log output. 
+#Make sure to remove this line before deploying to production.
+application.debug=False
 
 #information to log onto s3 to save the image files
 S3_PUBLIC_KEY = "AKIAIWHKKSAX2GVRHUZQ"
@@ -17,9 +21,12 @@ S3_PRIVATE_KEY = "mruUXSnyXU6ylrR3/ZAn66ND82YF4Vjkt/KSM5/W"
 s3_connection = boto.connect_s3(S3_PUBLIC_KEY, S3_PRIVATE_KEY)
 fz_s3_bucket = s3_connection.get_bucket("fz-images")
 
-#Set application.debug=true to enable tracebacks on Beanstalk log output. 
-#Make sure to remove this line before deploying to production.
-application.debug=False
+#information to long onto db for images
+db_PUBLIC_KEY = "AKIAIULWCPJA6GT3Y2WQ"
+db_PRIVATE_KEY = "kWcj7xo55mm162VnXtm47E4MxNeZTNKo7JpIzrTX"
+
+#connects to the db
+fz_images_db = im_db(db_PUBLIC_KEY, db_PRIVATE_KEY)
 
 #folders where uploads are temporary stored 
 UPLOAD_FOLDER = 'uploads/'
@@ -57,6 +64,27 @@ def test():
     import glob
     return str(glob.glob(os.getcwd()+"/fz/*")) + '\n' + str(glob.glob(os.getcwd()+"/uploads/*"))
 
+#simple api for latest zooms
+@application.route('/api/latest/<int:number>')
+@application.route('/api/latest/')
+def get(number = 15):
+    result = {}
+    print(type(number))
+    if number <= 100:
+        try:
+            images_dict = {}
+            for item in fz_images_db.getimagenames(number):
+                images_dict[item[0]] = item[1]
+            result['IMAGES'] = images_dict
+            status = "OK"
+        except KeyError:
+            status = "DB ERROR"
+    else:
+        status = "MAX results is 100"
+    result["STATUS"] = status
+    return jsonify(result)
+
+
 #home page has both GET and POST options as the upload is against the root domain
 @application.route('/', methods=['GET', 'POST'])
 def upload_file():
@@ -78,6 +106,9 @@ def upload_file():
             s3_fz_key.set_metadata("Content-Type", 'image/gif')
             s3_fz_key.set_contents_from_filename(GIF_FOLDER+gif_file_name_wpath[len(GIF_FOLDER):])
             s3_fz_key.make_public()
+
+            #add to db
+            fz_images_db.addimage(filename.rsplit('.', 1)[0])
 
             #cleanup files
             os.remove(filename_wpath)
