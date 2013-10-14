@@ -12,7 +12,7 @@ application = Flask(__name__)
 
 #Set application.debug=true to enable tracebacks on Beanstalk log output. 
 #Make sure to remove this line before deploying to production.
-application.debug=True
+application.debug=False
 
 #information to log onto s3 to save the image files
 S3_PUBLIC_KEY = "AKIAIWHKKSAX2GVRHUZQ"
