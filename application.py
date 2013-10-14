@@ -99,7 +99,7 @@ def browse():
 
     return render_template('browse.html', images=images_url_list)
 
-@application.route('/upload', methods=['POST'])
+@application.route('/upload', methods=['POST', 'GET'])
 def upload_file():
     error = None
     if request.method == 'POST':
