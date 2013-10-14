@@ -90,13 +90,11 @@ def get(number = 15):
 
 #browse page
 @application.route('/browse')
-@application.route('/browse/')
 def browse():
-    #need to actually make that template :P
     images_url_list = []
     for item in fz_images_db.getimagenames(15):
-        images_url_list.insert(0,"https://{0}.s3.amazonaws.com/{1}.gif".format(fz_s3_bucket.name, item[1]))
-
+        #images_url_list.insert(0,"https://{0}.s3.amazonaws.com/{1}.gif".format(fz_s3_bucket.name, item[1]))
+        images_url_list.insert(0, item[1])
     return render_template('browse.html', images=images_url_list)
 
 @application.route('/upload', methods=['POST', 'GET'])
