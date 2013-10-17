@@ -140,7 +140,10 @@ def upload_file():
             s3_fz_key.make_public()
 
             #compresses gif as much as possible
+            print("this is where my test is")
+            print(str(glob.glob(os.getcwd()+"/*")))
             os.system("convert {0} -fuzz 30% -layers Optimize {0}".format(gif_file_name_wpath))
+            print("end test")
 
             #add to db
             fz_images_db.addimage(filename.rsplit('.', 1)[0])
