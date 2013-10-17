@@ -14,11 +14,13 @@ class im_db:
 
 	def inclatest(self, num=1):
 		"""increments latest counter in the db"""
+		self.updatelatest()
 		self.dbitem_latest.add_attribute("most reacent", num)
 		self.dbitem_latest.save()
 		self.latest += 1
 
 	def removelatest(self):
+		self.updatelatest()
 		self.imtable.get_item(self.latest).delete()
 		self.dbitem_latest.add_attribute("most reacent", -1)
 		self.dbitem_latest.save()
@@ -26,11 +28,13 @@ class im_db:
 
 	def addimage(self, s3id):
 		"""given an id, adds the item to the db and increments the db count"""
+		self.updatelatest()
 		self.imtable.new_item(hash_key = self.latest+1, attrs= {"s3id" : s3id}).put()
 		self.inclatest() #if more than one server is used, this needs to be changed :P
 
 	def getimagesrange(self, start=0, number=10):
 		"""start is the number of images back, then number is how many to grab (going futher back)"""
+		self.updatelatest()
 		image_nums = [n for n in range(self.latest-start-number+1, self.latest-start+1)]
 		results_dict = self.imtable.batch_get_item(image_nums)
 
@@ -47,6 +51,7 @@ class im_db:
 
 	def getimagenames(self, num=10):
 		"""returns the (Defult) 10 latest items from the db"""
+		self.updatelatest()
 		results_dict = self.imtable.batch_get_item([n for n in range(self.latest-num+1, self.latest+1)])
 		return sorted([[item['photo number'], str(item['s3id'])] for item in results_dict])
 

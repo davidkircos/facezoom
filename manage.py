@@ -1,5 +1,5 @@
-import boto
 from fzdb import im_db
+import boto
 import os
 
 #information to log onto s3 to save the image files
@@ -23,6 +23,7 @@ def remove_latest_zoom():
 	fz_images_db.removelatest()
 
 def compress_s3():
+	"""applies compression to all items in s3, shouldn't EVER need to be run again"""
 	all_images = fz_s3_bucket.get_all_keys()
 	n = 0
 	for image in all_images:
@@ -40,4 +41,3 @@ def compress_s3():
 		print(n,"::Removed from local filesystem.  Moving on to next image.")
 
 
-compress_s3()
