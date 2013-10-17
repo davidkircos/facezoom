@@ -1,5 +1,6 @@
 import boto
 from fzdb import im_db
+import os
 
 #information to log onto s3 to save the image files
 S3_PUBLIC_KEY = "AKIAIWHKKSAX2GVRHUZQ"
@@ -21,4 +22,22 @@ def remove_latest_zoom():
 	fz_s3_bucket.delete_key(name)
 	fz_images_db.removelatest()
 
-remove_latest_zoom()
+def compress_s3():
+	all_images = fz_s3_bucket.get_all_keys()
+	n = 0
+	for image in all_images:
+		n+=1
+		test_image = image
+		print(n,"::Working on:", test_image)
+		#test_image.get_contents_to_filename("current.gif")
+		print(n,"::Got it...")
+		#os.system("convert {0} -layers Optimize {0}".format("current.gif"))
+		print(n,"::Optimized it...")
+		#test_image.set_contents_from_filename("current.gif")
+		#test_image.make_public()
+		print(n,"::Saved it back to s3...")
+		#os.remove("current.gif")
+		print(n,"::Removed from local filesystem.  Moving on to next image.")
+
+
+compress_s3()
