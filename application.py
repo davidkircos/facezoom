@@ -90,12 +90,21 @@ def get(number = 15):
 
 #browse page
 @application.route('/browse')
-def browse():
+@application.route('/browse/')
+@application.route('/browse/<int:pagenum>')
+def browse(pagenum=0):
     images_url_list = []
-    for item in fz_images_db.getimagenames(15):
+    images_list = fz_images_db.getimagespage(pagenum)
+    if not images_list:
+        return render_template('browse.html', error= "No more images.")
+    for item in fz_images_db.getimagespage(pagenum):
         #images_url_list.insert(0,"https://{0}.s3.amazonaws.com/{1}.gif".format(fz_s3_bucket.name, item[1]))
         images_url_list.insert(0, item[1])
-    return render_template('browse.html', images=images_url_list)
+    prevpage = None
+    nextpage = pagenum + 1
+    if pagenum != 0:
+        prevpage = pagenum - 1
+    return render_template('browse.html', images=images_url_list, prevpage=prevpage, nextpage=nextpage)
 
 @application.route('/upload', methods=['POST', 'GET'])
 def upload_file():

@@ -29,11 +29,32 @@ class im_db:
 		self.imtable.new_item(hash_key = self.latest+1, attrs= {"s3id" : s3id}).put()
 		self.inclatest() #if more than one server is used, this needs to be changed :P
 
-	def getimagenames(self, num=15):
-		"""returns the (Defult) 15 latest items from the db"""
+	def getimagesrange(self, start=0, number=10):
+		"""start is the number of images back, then number is how many to grab (going futher back)"""
+		image_nums = [n for n in range(self.latest-start-number+1, self.latest-start+1)]
+		results_dict = self.imtable.batch_get_item(image_nums)
+
+		if self.latest-start < 1:
+			return []	
+
+		result_list = []
+		for item in results_dict:
+			if item['photo number'] >= 1:
+				result_list.append([item['photo number'], str(item['s3id'])])
+		#
+		return sorted(result_list)
+
+
+	def getimagenames(self, num=10):
+		"""returns the (Defult) 10 latest items from the db"""
 		results_dict = self.imtable.batch_get_item([n for n in range(self.latest-num+1, self.latest+1)])
 		return sorted([[item['photo number'], str(item['s3id'])] for item in results_dict])
 
+	def getimagespage(self, page=0, pagelength=10):
+		"""returns pageinated results"""
+		if page*pagelength > self.latest:
+			return []
+		return self.getimagesrange(page*pagelength, pagelength)
 
 """
 #adds all from s3

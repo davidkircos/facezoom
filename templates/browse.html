@@ -4,16 +4,19 @@
 <meta name="twitter:title" content="broswse facezoom">
 <meta name="twitter:description" content="facezoom generates animated zooming gifs">
 
+<meta name="viewport" content="width=device-width, initial-scale=.47, maximum-scale=.47, user-scalable=no" />
+
 <title>facezoom</title>
 <html>
-<body>
-
-<body bgcolor="#461B7E">
+<body link="Black" vlink="Black" alink="Black">
 <center>
 <head>
-<font color=orange size=36>facezoom</font>
+<a href='/' style="text-decoration: none">
+<font color="#F6961B" size=36>facezoom</font></a>
 <font color=lightblue size="12"><sup><small>BETA</small></sup></font>
-
+</head>
+{% if not error %}
+<br><br>
 {% for image in images %}
 <center>
 <a href="/im/{{ image }}">
@@ -22,7 +25,30 @@
 <br>
 {% endfor %}
 
+{% if prevpage != None %}
+<font size = 24>
+<a href="/browse/{{ prevpage }}">Previous</a></font>
+&nbsp;&nbsp;&nbsp;
+{% endif %}
+{% if nextpage %}
+<font size = 24>
+<a href="/browse/{{ nextpage }}">Next</a></font>
+{% endif %}
+<br><br>
+{% endif %}
 
+
+{% if error %}
+<br><br>
+<font color="red">{{ error }}</font>
+<br>
+<font size = 24>
+<a href="/browse/0">First</a></font>
+<br><br>
+{% endif %}
+
+
+</font>
 <!-- AddThis Button BEGIN -->
 <style>
         div.addthis_toolbox {
