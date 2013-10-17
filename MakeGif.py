@@ -24,15 +24,15 @@ def makegif(jpg_file_name, result_file_name):
 	temp_image = temp_image.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
 
 	#time in between frames
-	original_duration = 0.14
+	original_duration = 0.13
 
 	#generate fames to be put into gif
 	w,h = temp_image.size
 	frames = [temp_image.copy()]
-	mult = 40
+	mult = 48
 	for x in range(1,3):
 		x = x * mult
-		temp_image = temp_image.rotate(2)
+		temp_image = temp_image.rotate(1.5)
 		temp_image = temp_image.crop((29,29,w-x*w/h,h-x*h/w))
 		sharpener = ImageEnhance.Sharpness(temp_image.convert('RGB'))
 		temp_image = sharpener.enhance(1)

@@ -12,7 +12,7 @@ application = Flask(__name__)
 
 #Set application.debug=true to enable tracebacks on Beanstalk log output. 
 #Make sure to remove this line before deploying to production.
-application.debug=False
+application.debug=True
 
 #information to log onto s3 to save the image files
 S3_PUBLIC_KEY = "AKIAIWHKKSAX2GVRHUZQ"
@@ -131,13 +131,16 @@ def upload_file():
 
             #writes gif to disk
             gif_file_name_wpath = makegif(os.path.join(application.config['UPLOAD_FOLDER'], filename), os.path.join((GIF_FOLDER + filename)))
-            
+
             #upload gif to s3
             s3_fz_key = boto.s3.key.Key(fz_s3_bucket)
             s3_fz_key.key = gif_file_name_wpath[len(GIF_FOLDER):]
             s3_fz_key.set_metadata("Content-Type", 'image/gif')
             s3_fz_key.set_contents_from_filename(GIF_FOLDER+gif_file_name_wpath[len(GIF_FOLDER):])
             s3_fz_key.make_public()
+
+            #compresses gif as much as possible
+            os.system("convert {0} -fuzz 30% -layers Optimize {0}".format(gif_file_name_wpath))
 
             #add to db
             fz_images_db.addimage(filename.rsplit('.', 1)[0])
