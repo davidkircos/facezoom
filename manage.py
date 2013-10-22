@@ -21,6 +21,7 @@ def remove_latest_zoom():
 	name = fz_images_db.getimagenames(1)[0][1]+".gif"
 	fz_s3_bucket.delete_key(name)
 	fz_images_db.removelatest()
+	print("latest zoom removed")
 
 def compress_s3():
 	"""applies compression to all items in s3, shouldn't EVER need to be run again"""
@@ -39,5 +40,7 @@ def compress_s3():
 		print(n,"::Saved it back to s3...")
 		#os.remove("current.gif")
 		print(n,"::Removed from local filesystem.  Moving on to next image.")
+
+
 
 
