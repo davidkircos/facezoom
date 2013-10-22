@@ -132,8 +132,8 @@ def upload_file():
             #writes gif to disk
             gif_file_name_wpath = makegif(os.path.join(application.config['UPLOAD_FOLDER'], filename), os.path.join((GIF_FOLDER + filename)))
 
-            #compresses gif as much as possible
-            os.system("convert {0} -layers Optimize {0}".format(gif_file_name_wpath))
+            #compresses gif as much as possible: this isn't perfect so it it has been removed for now...
+            #os.system("convert {0} -layers Optimize {0}".format(gif_file_name_wpath))
 
             #upload gif to s3
             s3_fz_key = boto.s3.key.Key(fz_s3_bucket)
