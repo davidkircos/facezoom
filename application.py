@@ -3,6 +3,7 @@ from flask import Flask, request, redirect, url_for, send_from_directory, render
 from werkzeug import secure_filename
 from fzdb import im_db
 import hashlib, copy
+from StringIO import StringIO
 
 import boto
 
@@ -32,15 +33,9 @@ fz_images_db = im_db(db_PUBLIC_KEY, db_PRIVATE_KEY)
 #folders where uploads are temporary stored 
 UPLOAD_FOLDER = 'uploads/'
 
-#url used for images on the server
-GIF_FOLDER = 'fz/'
-
 #config for the uploads on the server
 ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'png'])
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-#to prevent double uploads
-image_hashes = []
 
 #generates 10 char file names made with upper lower case letters and numbers 0-9
 def file_name_generator(legnth):
@@ -110,44 +105,31 @@ def browse(pagenum=0):
 def upload_file():
     error = None
     if request.method == 'POST':
-        upload_file = request.files['file']
-        if upload_file and allowed_file(upload_file.filename):
-            #saves upload to disk
-            filename = file_name_generator(10) + '.' + upload_file.filename.rsplit('.', 1)[1].lower()
-            filename_wpath = UPLOAD_FOLDER + filename
-            upload_file.save(os.path.join(application.config['UPLOAD_FOLDER'], filename))
-
-            #checks upload unqunes, prevents back button from doing a duplicate upload
-            sha1sum = hashlib.sha1(open(os.path.join(application.config['UPLOAD_FOLDER'], filename),'rb').read()).hexdigest()
-            if sha1sum in image_hashes:
-                #keeps the hash list short
-                if len(image_hashes) > 25:
-                    image_hashes.pop(0)
-                #cleanup upload file
-                os.remove(filename_wpath)
-                return redirect('/upload')
+        uploaded_file = request.files['file']
+        if uploaded_file and allowed_file(uploaded_file.filename):
+            filename = file_name_generator(10) + '.' + uploaded_file.filename.rsplit('.', 1)[1].lower()
+            if type(uploaded_file.stream) == file:
+                uploaded_file_file = uploaded_file.stream
             else:
-                image_hashes.append(sha1sum)
+                uploaded_file_file = StringIO(uploaded_file.stream.getvalue())
 
-            #writes gif to disk
-            gif_file_name_wpath = makegif(os.path.join(application.config['UPLOAD_FOLDER'], filename), os.path.join((GIF_FOLDER + filename)))
+            #generates gif and puts it in a stringio
+            gif_stringio = makegif(uploaded_file_file)
+            gif_stringio.seek(0)
 
             #compresses gif as much as possible: this isn't perfect so it it has been removed for now.
             #os.system("convert {0} -layers Optimize {0}".format(gif_file_name_wpath))
 
-            #upload gif to s3
+            filename = file_name_generator(10) + '.gif'
             s3_fz_key = boto.s3.key.Key(fz_s3_bucket)
-            s3_fz_key.key = gif_file_name_wpath[len(GIF_FOLDER):]
+            s3_fz_key.key = filename
             s3_fz_key.set_metadata("Content-Type", 'image/gif')
-            s3_fz_key.set_contents_from_filename(GIF_FOLDER+gif_file_name_wpath[len(GIF_FOLDER):])
+            s3_fz_key.set_contents_from_file(gif_stringio)
             s3_fz_key.make_public()
 
             #add to db
             fz_images_db.addimage(filename.rsplit('.', 1)[0])
 
-            #cleanup files
-            os.remove(filename_wpath)
-            os.remove(gif_file_name_wpath)
 
             return redirect('im/'+filename.rsplit('.', 1)[0])
 

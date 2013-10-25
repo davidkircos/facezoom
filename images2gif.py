@@ -477,17 +477,15 @@ class GifWriter:
 
 ## Exposed functions
 
-def writeGif(filename, images, duration=0.1, repeat=True, dither=False, 
+def writeGif(images, duration=0.1, repeat=True, dither=False, 
                 nq=0, subRectangles=True, dispose=None):
-    """ writeGif(filename, images, duration=0.1, repeat=True, dither=False,
+    """ writeGif(images, duration=0.1, repeat=True, dither=False,
                     nq=0, subRectangles=True, dispose=None)
     
-    Write an animated gif from the specified images.
+    Returns a StringIO of the gif.
     
     Parameters
     ----------
-    filename : string
-        The name of the file to write the image to.
     images : list
         Should be a list consisting of PIL images or numpy arrays.
         The latter should be between 0 and 255 for integer types, and
@@ -570,11 +568,13 @@ def writeGif(filename, images, duration=0.1, repeat=True, dither=False,
     images = gifWriter.convertImagesToPIL(images, dither, nq)
     
     # Write
-    fp = open(filename, 'wb')
+    #fp = open(filename, 'wb')
+    from StringIO import StringIO
+    fp = StringIO()
     try:
         gifWriter.writeGifToFile(fp, images, duration, loops, xy, dispose)
     finally:
-        fp.close()
+        return fp
 
 
 

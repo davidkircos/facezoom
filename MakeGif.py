@@ -1,21 +1,13 @@
 from PIL import Image, ImageSequence, ImageEnhance
 from images2gif import writeGif
-import PIL, random, string, exifread
+import PIL, random, string, fix_orientation
 
-def makegif(jpg_file_name, result_file_name):
-	temp_image = Image.open(jpg_file_name)
+def makegif(in_file):
+	temp_image = Image.open(in_file)
+	#temp_image = Image.open(in_file)
 
 	#rotates weird iphone images correctly
-	try:
-		f = open(jpg_file_name, 'rb')
-		tags = exifread.process_file(f)
-		f.close()
-		if str(tags['Image Orientation']) == 'Rotated 90 CCW':
-			temp_image = temp_image.rotate(-90)
-		if str(tags['Image Orientation']) == 'Rotated 90 CW':
-			temp_image = temp_image.rotate(90)
-	except KeyError:
-		pass
+	temp_image = temp_image.rotate(fix_orientation.fix_orientation(temp_image)[1])
 
 	#resizes images to a basewidth of 640px
 	basewidth = 640
@@ -39,11 +31,5 @@ def makegif(jpg_file_name, result_file_name):
 		temp_image = temp_image.resize((w, h), Image.ANTIALIAS)
 		frames.append(temp_image.copy())
 
-	#sets gif filename
-	gif_file_name = result_file_name.rsplit('.', 1)[0] + ".gif"
-
-	#writes gif to file
-	writeGif(gif_file_name, frames, duration=original_duration, dither=0)
-
-	#returns the file name, this isn't really nessicary sense we gave it a file name initially and they just have different extenions (.*** in .gif out)
-	return gif_file_name
+	#returns a file object of the gif!
+	return writeGif(frames, duration=original_duration, dither=0)
