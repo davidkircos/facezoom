@@ -101,6 +101,53 @@ def browse(pagenum=0):
         prevpage = pagenum - 1
     return render_template('browse.html', images=images_url_list, prevpage=prevpage, nextpage=nextpage)
 
+
+@application.route('/api/1/upload', methods=['POST', 'GET'])
+def upload_api():
+    error = "Get not allowed."
+    if request.method == 'POST':
+        uploaded_file = request.files['file']
+        if uploaded_file and allowed_file(uploaded_file.filename):
+            filename = file_name_generator(10) + '.' + uploaded_file.filename.rsplit('.', 1)[1].lower()
+            if type(uploaded_file.stream) == file:
+                uploaded_file_file = uploaded_file.stream
+            else:
+                uploaded_file_file = StringIO(uploaded_file.stream.getvalue())
+
+            #generates gif and puts it in a stringio
+            gif_stringio = makegif(uploaded_file_file)
+            gif_stringio.seek(0)
+
+            #compresses gif as much as possible: this isn't perfect so it it has been removed for now.
+            #os.system("convert {0} -layers Optimize {0}".format(gif_file_name_wpath))
+
+            filename = file_name_generator(10) + '.gif'
+            s3_fz_key = boto.s3.key.Key(fz_s3_bucket)
+            s3_fz_key.key = filename
+            s3_fz_key.set_metadata("Content-Type", 'image/gif')
+            s3_fz_key.set_contents_from_file(gif_stringio)
+            s3_fz_key.make_public()
+
+            image_name = filename.rsplit('.', 1)[0]
+            #add to db
+            fz_images_db.addimage(image_name)
+
+            result = {
+                "image_id": image_name,
+                "image_url": "https://{0}.s3.amazonaws.com/{1}.gif".format(fz_s3_bucket.name, image_name),
+                "error": "NONE",
+            }
+
+            return jsonify(image_id=image_name,
+                            image_url="https://{0}.s3.amazonaws.com/{1}.gif".format(fz_s3_bucket.name, image_name),
+                            error="NONE")
+
+        #error is used to store a string of the error.  Not rendered if blank.
+        error = "File extension not allowed, use jpg, jpeg, png."
+
+    return jsonify(error=error)
+
+
 @application.route('/upload', methods=['POST', 'GET'])
 def upload_file():
     error = None
