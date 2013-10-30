@@ -10,7 +10,7 @@ def makegif(in_file):
 	temp_image = temp_image.rotate(fix_orientation.fix_orientation(temp_image)[1])
 
 	#resizes images to a basewidth of 640px
-	basewidth = 640
+	basewidth = 320
 	wpercent = (basewidth/float(temp_image.size[0]))
 	hsize = int((float(temp_image.size[1])*float(wpercent)))
 	temp_image = temp_image.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
