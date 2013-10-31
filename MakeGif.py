@@ -16,12 +16,12 @@ def makegif(in_file):
 	temp_image = temp_image.resize((basewidth,hsize), PIL.Image.ANTIALIAS)
 
 	#time in between frames
-	original_duration = 0.2
+	original_duration = 0.155
 
 	#generate fames to be put into gif
 	w,h = temp_image.size
 	frames = [temp_image.copy()]
-	mult = 20
+	mult = 17.5
 	for x in range(1,3):
 		x = x * mult
 		temp_image = temp_image.rotate(1.5)
