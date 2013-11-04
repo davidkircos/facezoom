@@ -6,7 +6,10 @@ import hashlib, copy
 from StringIO import StringIO
 
 #This is done so i keep the source code on github safely
-from aws_password import db_PUBLIC_KEY, db_PRIVATE_KEY, S3_PUBLIC_KEY, S3_PRIVATE_KEY
+try:
+    from aws_password import db_PUBLIC_KEY, db_PRIVATE_KEY, S3_PUBLIC_KEY, S3_PRIVATE_KEY
+except:
+    raise "This program intended to be deployed to AWS, and therefore requires access to an S3 filestore as well as Dynamo DB."
 
 import boto
 
