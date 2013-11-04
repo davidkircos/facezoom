@@ -38,15 +38,17 @@ ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'png'])
 application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #generates 10 char file names made with upper lower case letters and numbers 0-9
+#does not check if filename is already used, and should't need too bc a name collision is so unlikely
 def file_name_generator(legnth):
     return ''.join(random.sample(string.ascii_letters+string.digits,legnth))
 
-#checks if a file name is allowed
+#checks if a file name is allowed in uploaded files
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 #/fz is deprecated and /im is what is used now.   this serves the web page with the image url stored in s3
+#/fz is included here as to not break old links :)
 @application.route('/fz/<imagename>')
 @application.route('/im/<imagename>')
 def uploaded_file(imagename):
@@ -58,12 +60,13 @@ def layout_files(name):
     return send_from_directory('layout/', name)
 
 #shows the content of the folders /fz and /uploads on the server.  used to test if any images have been forgotten to be deleted
+#this is no longer needed as all file operations are now done using string streams in memory
 @application.route('/test')
 def test():
     import glob
     return str(glob.glob(os.getcwd()+"/fz/*")) + '\n' + str(glob.glob(os.getcwd()+"/uploads/*"))
 
-#simple api for latest zooms
+#simple api for latest zooms, not used for anything...
 @application.route('/api/latest/<int:number>')
 @application.route('/api/latest/')
 def get(number = 15):
@@ -118,9 +121,6 @@ def upload_api():
             gif_stringio = makegif(uploaded_file_file)
             gif_stringio.seek(0)
 
-            #compresses gif as much as possible: this isn't perfect so it it has been removed for now.
-            #os.system("convert {0} -layers Optimize {0}".format(gif_file_name_wpath))
-
             filename = file_name_generator(10) + '.gif'
             s3_fz_key = boto.s3.key.Key(fz_s3_bucket)
             s3_fz_key.key = filename
@@ -155,6 +155,9 @@ def upload_file():
         uploaded_file = request.files['file']
         if uploaded_file and allowed_file(uploaded_file.filename):
             filename = file_name_generator(10) + '.' + uploaded_file.filename.rsplit('.', 1)[1].lower()
+            
+            #makes sure the upladed file is a certin type
+            #flask is weird and changes the type based on filesize :/
             if type(uploaded_file.stream) == file:
                 uploaded_file_file = uploaded_file.stream
             else:
@@ -164,7 +167,7 @@ def upload_file():
             gif_stringio = makegif(uploaded_file_file)
             gif_stringio.seek(0)
 
-            #compresses gif as much as possible: this isn't perfect so it it has been removed for now.
+            #compresses gif as much as possible: this ruins the images so it it has been removed for now.
             #os.system("convert {0} -layers Optimize {0}".format(gif_file_name_wpath))
 
             filename = file_name_generator(10) + '.gif'
@@ -186,7 +189,7 @@ def upload_file():
     return render_template('index.html', error=error)
 
 
-#home page has both GET and POST options as the upload is against the root domain
+#home page
 @application.route('/', methods=['GET'])
 def index(error = None):
     return render_template('index.html', error=error)
