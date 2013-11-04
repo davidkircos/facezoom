@@ -5,7 +5,7 @@ from fzdb import im_db
 import hashlib, copy
 from StringIO import StringIO
 
-#This is done so i keep the source code on github safely
+#This is done so i can keep the source code on github safely
 try:
     from aws_password import db_PUBLIC_KEY, db_PRIVATE_KEY, S3_PUBLIC_KEY, S3_PRIVATE_KEY
 except:
