@@ -62,9 +62,6 @@ class im_db:
 		return self.getimagesrange(page*pagelength, pagelength)
 
 """
-#adds all from s3
-S3_PUBLIC_KEY = "AKIAIWHKKSAX2GVRHUZQ"
-S3_PRIVATE_KEY = "mruUXSnyXU6ylrR3/ZAn66ND82YF4Vjkt/KSM5/W"
 
 #setup for the connection to s3
 s3_connection = boto.connect_s3(S3_PUBLIC_KEY, S3_PRIVATE_KEY)

@@ -2,17 +2,15 @@ from fzdb import im_db
 import boto
 import os
 
-#information to log onto s3 to save the image files
-S3_PUBLIC_KEY = "AKIAIWHKKSAX2GVRHUZQ"
-S3_PRIVATE_KEY = "mruUXSnyXU6ylrR3/ZAn66ND82YF4Vjkt/KSM5/W"
+#This is done so i keep the source code on github safely
+try:
+    from aws_password import db_PUBLIC_KEY, db_PRIVATE_KEY, S3_PUBLIC_KEY, S3_PRIVATE_KEY
+except:
+    raise "This program intended to be deployed to AWS, and therefore requires access to an S3 filestore as well as Dynamo DB."
 
 #setup for the connection to s3
 s3_connection = boto.connect_s3(S3_PUBLIC_KEY, S3_PRIVATE_KEY)
 fz_s3_bucket = s3_connection.get_bucket("fz-images")
-
-#information to long onto db for images
-db_PUBLIC_KEY = "AKIAIULWCPJA6GT3Y2WQ"
-db_PRIVATE_KEY = "kWcj7xo55mm162VnXtm47E4MxNeZTNKo7JpIzrTX"
 
 #connects to the db
 fz_images_db = im_db(db_PUBLIC_KEY, db_PRIVATE_KEY)
