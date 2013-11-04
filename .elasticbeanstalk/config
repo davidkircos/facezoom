@@ -1,0 +1,14 @@
+[global]
+ApplicationName=facezoom
+ApplicationVersionName=Sample Application
+AwsCredentialFile=/Users/davidkircos/.elasticbeanstalk/aws_credential_file
+DevToolsEndpoint=git.elasticbeanstalk.us-east-1.amazonaws.com
+EnvironmentName=facezoom
+EnvironmentType=SingleInstance
+InstanceProfileName=
+OptionSettingFile=/Users/davidkircos/facezoom/ebapp/.elasticbeanstalk/optionsettings.facezoom
+RdsEnabled=No
+Region=us-east-1
+ServiceEndpoint=https://elasticbeanstalk.us-east-1.amazonaws.com
+SolutionStack=64bit Amazon Linux running Python
+
